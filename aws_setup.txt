@@ -1,0 +1,5 @@
+# create buckets (input/output)
+# create queue (incoming)
+# create topic (results)
+# create pipeline
+# connect bucket to queue
