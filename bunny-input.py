@@ -5,6 +5,7 @@ import os
 import sys
 import aws
 import settings
+import random
 
 
 class BunnyInput(object):
@@ -37,12 +38,18 @@ class BunnyInput(object):
                         sys.exit()
                     for message in self.get_messages_from_queue():
                         if message is not None:
-                            self.process_message(message)
-                            # TODO : send to error queue if unsuccessful
-                            message.delete()
+                            try:
+                                self.process_message(message)
+                            except:
+                                logging.exception("Error processing message")
+                                # TODO : send to error queue if unsuccessful ?
+                            finally:
+                                message.delete()
             except Exception:
                 logging.exception("Error getting messages")
-                # TODO : send to error queue
+                # TODO : send to error queue?
+            finally:
+                message.delete()
 
     def process_message(self, message):
 
@@ -71,8 +78,8 @@ class BunnyInput(object):
 
         for output in outputs:
             # prepend a folder, output will be copied back to original Key if job succeeds
-            output['Key'] = 'x/' + output['Key']
-            aws.delete_key(self.s3, settings.OUTPUT_BUCKET, output['Key'])
+            output['Key'] = self.get_random_prefix() + output['Key']
+            aws.delete_s3_object(self.s3, settings.OUTPUT_BUCKET, output['Key'])
 
         return aws.create_job(self.transcoder, job_id,  self.pipeline, source, outputs)
 
@@ -88,6 +95,11 @@ class BunnyInput(object):
     def get_pipeline(self):
 
         return aws.get_pipeline_by_name(self.transcoder, settings.PIPELINE)
+
+    @staticmethod
+    def get_random_prefix():
+
+        return "x/" + str(random.randint(0, 1000)).zfill(4) + "/"
 
     @staticmethod
     def set_logging():

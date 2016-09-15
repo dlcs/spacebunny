@@ -36,9 +36,15 @@ def get_preset_map(transcoder):
     return preset_map
 
 
-def delete_key(s3, bucket, key):
+def delete_s3_object(s3, bucket, key):
 
     s3.meta.client.delete_object(Bucket=bucket, Key=key)
+
+
+def move_S3_object(s3, bucket, old, new):
+
+    s3.meta.client.copy_object(CopySource={'Bucket': bucket, 'Key': old}, Bucket=bucket, Key=new)
+    s3.meta.client.delete_object(Bucket=bucket, Key=old)
 
 
 def get_queue_by_name(sqs, name):
@@ -59,6 +65,11 @@ def get_pipeline_by_name(transcoder, name):
             if pipeline['Name'] == name:
                 return pipeline['Id']
     return None
+
+
+def send_message(response_queue, result_string):
+
+    response_queue.send_message(MessageBody=result_string)
 
 
 def get_sqs_resource():
