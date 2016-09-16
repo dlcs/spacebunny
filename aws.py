@@ -1,6 +1,7 @@
 import boto3
 import settings
 import logging
+import time
 
 
 def create_job(transcoder, job_id, pipeline_id,  source, outputs):
@@ -16,7 +17,10 @@ def create_job(transcoder, job_id, pipeline_id,  source, outputs):
             'Container': 'auto'
         },
         Outputs=outputs,
-        UserMetadata={'jobId': str(job_id)}
+        UserMetadata={
+            'jobId': str(job_id),
+            'startTime': str(int(round(time.time() * 1000)))
+        }
     )
     logging.debug("result: %s", str(result))
     if result is not None:
@@ -26,13 +30,16 @@ def create_job(transcoder, job_id, pipeline_id,  source, outputs):
     return None
 
 
-def get_preset_map(transcoder):
+def get_preset_map(transcoder, inverse=False):
 
     preset_map = {}
     paginator = transcoder.get_paginator('list_presets')
     for page in paginator.paginate():
         for preset in page.get('Presets'):
-            preset_map[preset['Name']] = preset['Id']
+            if inverse:
+                preset_map[preset['Id']] = preset['Name']
+            else:
+                preset_map[preset['Name']] = preset['Id']
     return preset_map
 
 
