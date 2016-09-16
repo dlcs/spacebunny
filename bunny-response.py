@@ -47,9 +47,9 @@ class BunnyResponse(object):
                                 # TODO : send to error queue if unsuccessful ?
                             finally:
                                 message.delete()
-            except Exception:
+            except Exception as e:
                 logging.exception("Error getting messages")
-                # TODO : send to error queue?
+                raise e
 
     def process_message(self, message):
 
