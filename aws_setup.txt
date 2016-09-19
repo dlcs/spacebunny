@@ -1,5 +1,6 @@
 # create buckets (input/output)
-# create queue (incoming)
-# create topic (results)
-# create pipeline
-# connect bucket to queue
+# create queues (input/output)
+# create topic (response)
+# create queue (response) and subscribe to response topic
+# create pipeline - use input and output buckets, notify to response topic
+# set notifications on input bucket to send to input queue
