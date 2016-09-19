@@ -1,3 +1,4 @@
 settings.py
-*.pycpyc
+*.pyc
 *.log
+/run_container.sh
