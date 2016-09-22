@@ -1,4 +1,3 @@
-settings.py
 *.pyc
 *.log
 /run_container.sh
