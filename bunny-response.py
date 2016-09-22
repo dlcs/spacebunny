@@ -18,7 +18,8 @@ class BunnyResponse(object):
         self.s3 = None
         self.notification_queue = None
         self.response_queue = None
-        self.preset_map = None
+        self.preset_id_map = None
+        self.inverse_policy_map = None
 
     def run(self):
 
@@ -31,7 +32,8 @@ class BunnyResponse(object):
         self.notification_queue = self.get_notification_queue()
         self.response_queue = self.get_response_queue()
 
-        self.preset_map = aws.get_preset_map(self.transcoder, inverse=True)
+        self.preset_id_map = aws.get_preset_map(self.transcoder, inverse=True)
+        self.inverse_policy_map = self.get_inverse_policy_map()
 
         while True:
             try:
@@ -56,7 +58,8 @@ class BunnyResponse(object):
         data = json.loads(json.loads(message.body)['Message'])
         et_job_id = data['jobId']
         job_id = data['userMetadata']['jobId']
-        start_time = job_id = int(data['userMetadata']['startTime'])
+        start_time = int(data['userMetadata']['startTime'])
+        dlcs_id = data['userMetadata']['dlcsId']
         source = data['input']['key']
 
         outputs = data['outputs']
@@ -64,11 +67,23 @@ class BunnyResponse(object):
         success_count = 0
         error_count = 0
 
+        job_data = aws.get_job_data(self.transcoder, et_job_id)
+
         for output in outputs:
+
+            generated_key = output['key']
+            output_job_data = job_data[generated_key]
+            preset_id = output['presetId']
+            preset_name = self.preset_id_map.get(preset_id)
+            if preset_name in self.inverse_policy_map:
+                transcode_policy = self.inverse_policy_map[preset_name]
+            else:
+                transcode_policy = preset_name
+
             new_key = ""
             status = "error"
             if output['status'] == "Complete":
-                new_key = self.get_final_key(output['key'])
+                new_key = self.get_final_key(generated_key)
                 aws.move_S3_object(self.s3, settings.OUTPUT_BUCKET, output['key'], new_key)
                 status = "success"
                 success_count += 1
@@ -76,8 +91,13 @@ class BunnyResponse(object):
                 error_count += 1
             result_output = {
                 "destination": new_key,
-                "transcodePolicy": self.preset_map.get(output['presetId']),
-                "status":  status
+                "transcodePolicy": transcode_policy,
+                "status":  status,
+                "detail": output_job_data.get('StatusDetail'),
+                "size": output_job_data.get('FileSize'),
+                "duration": output_job_data.get('DurationMillis'),
+                "width": output_job_data.get("Width"),
+                "height": output_job_data.get("Height")
             }
             result_outputs.append(result_output)
 
@@ -97,10 +117,11 @@ class BunnyResponse(object):
             "message": "event::bunny-output",
             "params": {
                 "jobId": job_id,
-                "elasticTranscodeJobId": et_job_id,
+                "etJobId": et_job_id,
+                "dlcsId": dlcs_id,
                 "status": global_status,
                 "clockTime": int(round(time.time() * 1000)) - start_time,
-                "source": global_status,
+                "source": source,
                 "outputs":  outputs_string
             }
         }
@@ -113,6 +134,12 @@ class BunnyResponse(object):
 
         parts = key.split('/')
         return '/'.join(parts[2:])
+
+    @staticmethod
+    def get_inverse_policy_map():
+
+        original_map = settings.TRANSCODE_MAPPINGS
+        return dict(zip(original_map.values(), original_map.keys()))
 
     def get_messages_from_queue(self):
 

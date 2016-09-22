@@ -6,6 +6,7 @@ import sys
 import aws
 import settings
 import random
+import time
 
 
 class BunnyInput(object):
@@ -16,7 +17,7 @@ class BunnyInput(object):
         self.s3 = None
         self.input_queue = None
         self.pipeline = None
-        self.preset_map = None
+        self.preset_id_map = None
 
     def run(self):
 
@@ -29,7 +30,7 @@ class BunnyInput(object):
         self.input_queue = self.get_input_queue()
         self.pipeline = self.get_pipeline()
 
-        self.preset_map = aws.get_preset_map(self.transcoder)
+        self.preset_id_map = aws.get_preset_map(self.transcoder)
 
         while True:
             try:
@@ -60,26 +61,39 @@ class BunnyInput(object):
                 return False
             job_id = params.get('jobId')
             source = params.get('source')
+            dlcs_id = params.get('dlcsId')
             encoded_formats = params.get('formats')
             decoded_formats = base64.b64decode(encoded_formats)
             formats = json.loads(decoded_formats)
             outputs = map(lambda o: {'Key': o.get('destination'),
-                                     'PresetId': self.preset_map.get(o['transcodePolicy'])}, formats)
+                                     'PresetId': self.get_preset_id(o.get('transcodePolicy'))}, formats)
             logging.debug("transcoding for jobId: %s" % (job_id,))
-            success = self.transcode_video(job_id, source, outputs)
+            success = self.transcode_video(job_id, dlcs_id, source, outputs)
 
         else:
             logging.info("Unknown message type received")
             return False, "Unknown message type"
 
-    def transcode_video(self, job_id, source, outputs):
+    def get_preset_id(self, policy_name):
+
+        preset_name = policy_name
+        if policy_name in settings.TRANSCODE_MAPPINGS:
+            preset_name = settings.TRANSCODE_MAPPINGS.get(policy_name)
+        return self.preset_id_map.get(preset_name)
+
+    def transcode_video(self, job_id, dlcs_id, source, outputs):
 
         for output in outputs:
             # prepend a folder, output will be copied back to original Key if job succeeds
             output['Key'] = self.get_random_prefix() + output['Key']
             aws.delete_s3_object(self.s3, settings.OUTPUT_BUCKET, output['Key'])
 
-        return aws.create_job(self.transcoder, job_id,  self.pipeline, source, outputs)
+        metadata = {
+            'jobId': str(job_id),
+            'dlcsId': str(dlcs_id),
+            'startTime': str(int(round(time.time() * 1000)))
+        }
+        return aws.create_job(self.transcoder, metadata, self.pipeline, source, outputs)
 
     def get_messages_from_queue(self):
 

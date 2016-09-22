@@ -8,7 +8,7 @@ formats = [
 
     {
         "destination": "videos/mp4/filename.mp4",
-        "transcodePolicy": "System preset: Web"
+        "transcodePolicy": "Welcome Standard MP4"
     },
     {
         "destination": "videos/webm/filename.webm",
@@ -23,6 +23,7 @@ message = {
   "message": "event::call-bunny",
 
   "params": {
+    "dlcsId": "7/3/ae32f1b2",
     "jobId": str(uuid.uuid4()),
     "source": "sample.mp4",
     "formats": base64.b64encode(json.dumps(formats))

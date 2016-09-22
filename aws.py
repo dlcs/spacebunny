@@ -1,10 +1,9 @@
 import boto3
 import settings
 import logging
-import time
 
 
-def create_job(transcoder, job_id, pipeline_id,  source, outputs):
+def create_job(transcoder, metadata, pipeline_id,  source, outputs):
 
     result = transcoder.create_job(
         PipelineId=pipeline_id,
@@ -17,10 +16,7 @@ def create_job(transcoder, job_id, pipeline_id,  source, outputs):
             'Container': 'auto'
         },
         Outputs=outputs,
-        UserMetadata={
-            'jobId': str(job_id),
-            'startTime': str(int(round(time.time() * 1000)))
-        }
+        UserMetadata=metadata
     )
     logging.debug("result: %s", str(result))
     if result is not None:
@@ -28,6 +24,12 @@ def create_job(transcoder, job_id, pipeline_id,  source, outputs):
         if 200 <= status_code < 300:
             return result['Job']['Id']
     return None
+
+
+def get_job_data(transcoder, job_id):
+
+    job = transcoder.read_job(Id=job_id)
+    return {o['Key']: o for o in job['Job']['Outputs']}
 
 
 def get_preset_map(transcoder, inverse=False):
