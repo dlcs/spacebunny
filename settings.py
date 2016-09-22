@@ -3,6 +3,11 @@ import os
 MESSAGES_PER_FETCH = 5
 POLL_INTERVAL = 20
 
+TRANSCODE_MAPPINGS = {
+    'Welcome Standard MP4': 'System preset: Web',
+    'Welcome Standard WebM': 'Wellcome WebM'
+}
+
 REGION = os.environ.get('BUNNY_AWS_REGION')  # e.g. 'eu-west-1'
 INPUT_QUEUE = os.environ.get('BUNNY_INPUT_QUEUE')  # e.g. 'bunny-input'
 NOTIFICATION_QUEUE = os.environ.get('BUNNY_NOTIFICATION_QUEUE')  # e.g. 'bunny-notification'
