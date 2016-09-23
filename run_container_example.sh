@@ -5,6 +5,7 @@ docker run \
         --env AWS_ACCESS_KEY_ID="CHANGEME" \
         --env AWS_SECRET_ACCESS_KEY="CHANGEME"  \
         --env BUNNY_INPUT_QUEUE=bunny-input  \
+        --env BUNNY_ERROR_QUEUE=bunny-input  \
         --env BUNNY_NOTIFICATION_QUEUE=bunny-notification  \
         --env BUNNY_RESPONSE_QUEUE=bunny-response  \
         --env BUNNY_PIPELINE=bunny-pipeline  \

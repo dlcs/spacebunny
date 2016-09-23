@@ -83,9 +83,9 @@ def get_pipeline_by_name(transcoder, name):
     return None
 
 
-def send_message(response_queue, result_string):
+def send_message(queue, result_string):
 
-    response_queue.send_message(MessageBody=result_string)
+    queue.send_message(MessageBody=result_string)
 
 
 def get_sqs_resource():

@@ -16,6 +16,7 @@ class BunnyInput(object):
         self.transcoder = None
         self.s3 = None
         self.input_queue = None
+        self.error_queue = None
         self.pipeline = None
         self.preset_id_map = None
 
@@ -28,6 +29,7 @@ class BunnyInput(object):
         self.s3 = aws.get_s3_resource()
 
         self.input_queue = self.get_input_queue()
+        self.error_queue = self.get_error_queue()
         self.pipeline = self.get_pipeline()
 
         self.preset_id_map = aws.get_preset_map(self.transcoder)
@@ -43,7 +45,7 @@ class BunnyInput(object):
                                 self.process_message(message)
                             except:
                                 logging.exception("Error processing message")
-                                # TODO : send to error queue if unsuccessful ?
+                                aws.send_message(self.error_queue, message)
                             finally:
                                 message.delete()
             except Exception as e:
@@ -103,6 +105,10 @@ class BunnyInput(object):
     def get_input_queue(self):
 
         return aws.get_queue_by_name(self.sqs, settings.INPUT_QUEUE)
+
+    def get_error_queue(self):
+
+        return aws.get_queue_by_name(self.sqs, settings.ERROR_QUEUE)
 
     def get_pipeline(self):
 
