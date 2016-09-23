@@ -1,5 +1,9 @@
 import boto3
+<<<<<<< HEAD
 from boto.exception import BotoServerError
+=======
+import botocore.exceptions
+>>>>>>> 8c071516daefe37860716b3b807876ac9288534f
 
 import settings
 import logging
@@ -30,8 +34,7 @@ def create_job(transcoder, metadata, pipeline_id,  source, outputs):
 
 def get_job_data(transcoder, job_id):
 
-    job = transcoder.read_job(Id=job_id)
-    return {o['Key']: o for o in job['Job']['Outputs']}
+    return transcoder.read_job(Id=job_id)
 
 
 def get_preset_map(transcoder, inverse=False):
@@ -52,8 +55,13 @@ def delete_s3_object(s3, bucket, key):
     logging.debug("Attempting to delete key %s from bucket %s" % (key, bucket))
     try:
         s3.meta.client.delete_object(Bucket=bucket, Key=key)
+<<<<<<< HEAD
     except BotoServerError:
         logging.debug("Caught exception confirming temp file %s didn't already exist in bucket %s" % (key, bucket))
+=======
+    except botocore.exceptions.ClientError as e:
+        logging.debug("Caught exception confirming temp file %s didn't already exist in bucket %s" % (key, bucket), e)
+>>>>>>> 8c071516daefe37860716b3b807876ac9288534f
 
 
 def move_s3_object(s3, bucket, old, new):
@@ -61,6 +69,11 @@ def move_s3_object(s3, bucket, old, new):
     logging.debug("Attempting to move key %s to key %s in bucket %s" % (old, new, bucket))
     s3.meta.client.copy_object(CopySource={'Bucket': bucket, 'Key': old}, Bucket=bucket, Key=new)
     s3.meta.client.delete_object(Bucket=bucket, Key=old)
+
+
+def put_s3_object(s3, bucket, key, data):
+
+    s3.meta.client.put_object(Bucket=bucket, Key=key, Body=data)
 
 
 def get_queue_by_name(sqs, name):
@@ -83,9 +96,9 @@ def get_pipeline_by_name(transcoder, name):
     return None
 
 
-def send_message(response_queue, result_string):
+def send_message(queue, result_string):
 
-    response_queue.send_message(MessageBody=result_string)
+    queue.send_message(MessageBody=result_string)
 
 
 def get_sqs_resource():
