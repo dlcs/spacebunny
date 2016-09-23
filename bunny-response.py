@@ -84,7 +84,7 @@ class BunnyResponse(object):
             status = "error"
             if output['status'] == "Complete":
                 new_key = self.get_final_key(generated_key)
-                aws.move_S3_object(self.s3, settings.OUTPUT_BUCKET, output['key'], new_key)
+                aws.move_s3_object(self.s3, settings.OUTPUT_BUCKET, output['key'], new_key)
                 status = "success"
                 success_count += 1
             else:

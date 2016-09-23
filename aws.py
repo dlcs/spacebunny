@@ -47,11 +47,13 @@ def get_preset_map(transcoder, inverse=False):
 
 def delete_s3_object(s3, bucket, key):
 
+    logging.debug("Attempting to delete key %s from bucket %s" % (key, bucket))
     s3.meta.client.delete_object(Bucket=bucket, Key=key)
 
 
-def move_S3_object(s3, bucket, old, new):
+def move_s3_object(s3, bucket, old, new):
 
+    logging.debug("Attempting to move key %s to key %s in bucket %s" % (old, new, bucket))
     s3.meta.client.copy_object(CopySource={'Bucket': bucket, 'Key': old}, Bucket=bucket, Key=new)
     s3.meta.client.delete_object(Bucket=bucket, Key=old)
 
