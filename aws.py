@@ -1,4 +1,6 @@
 import boto3
+import botocore.exceptions
+
 import settings
 import logging
 
@@ -48,7 +50,10 @@ def get_preset_map(transcoder, inverse=False):
 def delete_s3_object(s3, bucket, key):
 
     logging.debug("Attempting to delete key %s from bucket %s" % (key, bucket))
-    s3.meta.client.delete_object(Bucket=bucket, Key=key)
+    try:
+        s3.meta.client.delete_object(Bucket=bucket, Key=key)
+    except botocore.exceptions.ClientError as e:
+        logging.debug("Caught exception confirming temp file %s didn't already exist in bucket %s" % (key, bucket), e)
 
 
 def move_s3_object(s3, bucket, old, new):
