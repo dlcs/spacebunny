@@ -46,7 +46,6 @@ class BunnyResponse(object):
                                 self.process_message(message)
                             except:
                                 logging.exception("Error processing message")
-                                # TODO : send to error queue if unsuccessful ?
                             finally:
                                 message.delete()
             except Exception as e:
@@ -67,12 +66,14 @@ class BunnyResponse(object):
         success_count = 0
         error_count = 0
 
-        job_data = aws.get_job_data(self.transcoder, et_job_id)
+        full_job_data = aws.get_job_data(self.transcoder, et_job_id)
+        self.store_job_data(settings.JOB_DATA_BUCKET, dlcs_id, json.dumps(full_job_data))
+        output_info = {o['Key']: o for o in full_job_data['Job']['Outputs']}
 
         for output in outputs:
 
             generated_key = output['key']
-            output_job_data = job_data[generated_key]
+            output_job_data = output_info[generated_key]
             preset_id = output['presetId']
             preset_name = self.preset_id_map.get(preset_id)
             if preset_name in self.inverse_policy_map:
@@ -128,6 +129,10 @@ class BunnyResponse(object):
 
         result_string = json.dumps(result)
         aws.send_message(self.response_queue, result_string)
+
+    def store_job_data(self, bucket, key, data):
+
+        aws.put_s3_object(self.s3, bucket, key, data)
 
     @staticmethod
     def get_final_key(key):

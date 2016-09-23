@@ -30,8 +30,7 @@ def create_job(transcoder, metadata, pipeline_id,  source, outputs):
 
 def get_job_data(transcoder, job_id):
 
-    job = transcoder.read_job(Id=job_id)
-    return {o['Key']: o for o in job['Job']['Outputs']}
+    return transcoder.read_job(Id=job_id)
 
 
 def get_preset_map(transcoder, inverse=False):
@@ -61,6 +60,11 @@ def move_s3_object(s3, bucket, old, new):
     logging.debug("Attempting to move key %s to key %s in bucket %s" % (old, new, bucket))
     s3.meta.client.copy_object(CopySource={'Bucket': bucket, 'Key': old}, Bucket=bucket, Key=new)
     s3.meta.client.delete_object(Bucket=bucket, Key=old)
+
+
+def put_s3_object(s3, bucket, key, data):
+
+    s3.meta.client.put_object(Bucket=bucket, Key=key, Body=data)
 
 
 def get_queue_by_name(sqs, name):

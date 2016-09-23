@@ -10,4 +10,5 @@ docker run \
         --env BUNNY_RESPONSE_QUEUE=bunny-response  \
         --env BUNNY_PIPELINE=bunny-pipeline  \
         --env BUNNY_OUTPUT_BUCKET=bunny-output  \
+        --env BUNNY_JOB_DATA_BUCKET=bunny-job-data \
         spacebunny

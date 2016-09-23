@@ -15,3 +15,4 @@ NOTIFICATION_QUEUE = os.environ.get('BUNNY_NOTIFICATION_QUEUE')  # e.g. 'bunny-n
 RESPONSE_QUEUE = os.environ.get('BUNNY_RESPONSE_QUEUE')  # e.g. 'bunny-response'
 PIPELINE = os.environ.get('BUNNY_PIPELINE')  # e.g. bunny-pipeline'
 OUTPUT_BUCKET = os.environ.get('BUNNY_OUTPUT_BUCKET')  # e.g. 'bunny-output'
+JOB_DATA_BUCKET = os.environ.get('BUNNY_JOB_DATA_BUCKET')  # e.g. 'bunny-job-data'
