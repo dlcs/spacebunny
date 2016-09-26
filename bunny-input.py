@@ -45,7 +45,7 @@ class BunnyInput(object):
                                 self.process_message(message)
                             except:
                                 logging.exception("Error processing message")
-                                aws.send_message(self.error_queue, message)
+                                aws.send_message(self.error_queue, message.body)
                             finally:
                                 message.delete()
             except Exception as e:
