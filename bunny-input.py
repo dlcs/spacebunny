@@ -81,7 +81,9 @@ class BunnyInput(object):
         preset_name = policy_name
         if policy_name in settings.TRANSCODE_MAPPINGS:
             preset_name = settings.TRANSCODE_MAPPINGS.get(policy_name)
-        return self.preset_id_map.get(preset_name)
+        v = self.preset_id_map.get(preset_name)
+        logging.debug("get_preset_id (%s) = '%s'" % (policy_name, v))
+        return v
 
     def transcode_video(self, job_id, dlcs_id, source, outputs):
 
