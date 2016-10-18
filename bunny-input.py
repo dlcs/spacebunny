@@ -12,27 +12,17 @@ import time
 class BunnyInput(object):
 
     def __init__(self):
-        self.sqs = None
-        self.transcoder = None
-        self.s3 = None
-        self.input_queue = None
-        self.error_queue = None
-        self.pipeline = None
-        self.preset_id_map = None
-
-    def run(self):
 
         self.set_logging()
-
         self.sqs = aws.get_sqs_resource()
         self.transcoder = aws.get_transcoder_client()
         self.s3 = aws.get_s3_resource()
-
         self.input_queue = self.get_input_queue()
         self.error_queue = self.get_error_queue()
         self.pipeline = self.get_pipeline()
-
         self.preset_id_map = aws.get_preset_map(self.transcoder)
+
+    def run(self):
 
         try:
             while True:
