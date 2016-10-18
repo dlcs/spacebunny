@@ -34,23 +34,22 @@ class BunnyInput(object):
 
         self.preset_id_map = aws.get_preset_map(self.transcoder)
 
-        while True:
-            try:
-                while True:
-                    if os.path.exists('/tmp/stop.txt'):
-                        sys.exit()
-                    for message in self.get_messages_from_queue():
-                        if message is not None:
-                            try:
-                                self.process_message(message)
-                            except:
-                                logging.exception("Error processing message")
-                                aws.send_message(self.error_queue, message.body)
-                            finally:
-                                message.delete()
-            except Exception as e:
-                logging.exception("Error getting messages")
-                raise e
+        try:
+            while True:
+                if os.path.exists('/tmp/stop.txt'):
+                    sys.exit()
+                for message in self.get_messages_from_queue():
+                    if message is not None:
+                        try:
+                            self.process_message(message)
+                        except:
+                            logging.exception("Error processing message")
+                            aws.send_message(self.error_queue, message.body)
+                        finally:
+                            message.delete()
+        except Exception as e:
+            logging.exception("Error getting messages")
+            raise e
 
     def process_message(self, message):
 
