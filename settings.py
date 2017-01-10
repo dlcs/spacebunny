@@ -4,8 +4,9 @@ MESSAGES_PER_FETCH = 5
 POLL_INTERVAL = 20
 
 TRANSCODE_MAPPINGS = {
-    'Welcome Standard MP4': 'System preset: Web',
-    'Welcome Standard WebM': 'Wellcome WebM'
+    'Wellcome Standard MP4': 'System preset: Web',
+    'Wellcome Standard WebM': 'Wellcome WebM',
+    'Wellcome Standard MP3': 'Wellcome MP3'
 }
 
 REGION = os.environ.get('BUNNY_AWS_REGION')  # e.g. 'eu-west-1'

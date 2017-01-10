@@ -12,45 +12,34 @@ from boto3.s3.key import Key
 class BunnyInput(object):
 
     def __init__(self):
-        self.sqs = None
-        self.transcoder = None
-        self.s3 = None
-        self.input_queue = None
-        self.error_queue = None
-        self.pipeline = None
-        self.preset_id_map = None
-
-    def run(self):
 
         self.set_logging()
-
         self.sqs = aws.get_sqs_resource()
         self.transcoder = aws.get_transcoder_client()
         self.s3 = aws.get_s3_resource()
-
         self.input_queue = self.get_input_queue()
         self.error_queue = self.get_error_queue()
         self.pipeline = self.get_pipeline()
-
         self.preset_id_map = aws.get_preset_map(self.transcoder)
 
-        while True:
-            try:
-                while True:
-                    if os.path.exists('/tmp/stop.txt'):
-                        sys.exit()
-                    for message in self.get_messages_from_queue():
-                        if message is not None:
-                            try:
-                                self.process_message(message)
-                            except:
-                                logging.exception("Error processing message")
-                                aws.send_message(self.error_queue, message)
-                            finally:
-                                message.delete()
-            except Exception as e:
-                logging.exception("Error getting messages")
-                raise e
+    def run(self):
+
+        try:
+            while True:
+                if os.path.exists('/tmp/stop.txt'):
+                    sys.exit()
+                for message in self.get_messages_from_queue():
+                    if message is not None:
+                        try:
+                            self.process_message(message)
+                        except:
+                            logging.exception("Error processing message")
+                            aws.send_message(self.error_queue, message.body)
+                        finally:
+                            message.delete()
+        except Exception as e:
+            logging.exception("Error getting messages")
+            raise e
 
     def process_message(self, message):
 
@@ -83,7 +72,9 @@ class BunnyInput(object):
         preset_name = policy_name
         if policy_name in settings.TRANSCODE_MAPPINGS:
             preset_name = settings.TRANSCODE_MAPPINGS.get(policy_name)
-        return self.preset_id_map.get(preset_name)
+        v = self.preset_id_map.get(preset_name)
+        logging.debug("get_preset_id (%s) = '%s'" % (policy_name, v))
+        return v
 
     def transcode_video(self, job_id, dlcs_id, source, outputs):
 
