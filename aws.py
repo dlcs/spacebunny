@@ -1,9 +1,5 @@
 import boto3
-<<<<<<< HEAD
-from boto.exception import BotoServerError
-=======
 import botocore.exceptions
->>>>>>> 8c071516daefe37860716b3b807876ac9288534f
 
 import settings
 import logging
@@ -55,13 +51,8 @@ def delete_s3_object(s3, bucket, key):
     logging.debug("Attempting to delete key %s from bucket %s" % (key, bucket))
     try:
         s3.meta.client.delete_object(Bucket=bucket, Key=key)
-<<<<<<< HEAD
-    except BotoServerError:
-        logging.debug("Caught exception confirming temp file %s didn't already exist in bucket %s" % (key, bucket))
-=======
     except botocore.exceptions.ClientError as e:
         logging.debug("Caught exception confirming temp file %s didn't already exist in bucket %s" % (key, bucket), e)
->>>>>>> 8c071516daefe37860716b3b807876ac9288534f
 
 
 def move_s3_object(s3, bucket, old, new):
