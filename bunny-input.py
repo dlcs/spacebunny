@@ -7,7 +7,7 @@ import aws
 import settings
 import random
 import time
-
+from boto3.s3.key import Key
 
 class BunnyInput(object):
 
@@ -70,8 +70,10 @@ class BunnyInput(object):
             outputs = map(lambda o: {'Key': o.get('destination'),
                                      'PresetId': self.get_preset_id(o.get('transcodePolicy'))}, formats)
             logging.debug("transcoding for jobId: %s" % (job_id,))
-            success = self.transcode_video(job_id, dlcs_id, source, outputs)
-
+            transcodeJob = self.transcode_video(job_id, dlcs_id, source, outputs)
+            metadataKey = "%s/metadata" % (dlcs_id)
+            metadataBody = '<JobInProgress><ElasticTranscoderJob>%s</ElasticTranscoderJob></JobInProgress>' % transcodeJob['Job']['Id']
+            aws.put_s3_object(self.s3, settings.METADATA_BUCKET, metadataKey, metadataBody)
         else:
             logging.info("Unknown message type received")
             return False, "Unknown message type"
