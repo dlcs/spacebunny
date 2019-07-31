@@ -12,18 +12,6 @@ import time
 import datetime
 import pytz
 
-requested_to_quit = False
-
-sqs = aws.get_sqs_resource()
-transcoder = aws.get_transcoder_client()
-s3 = aws.get_s3_resource()
-
-notification_queue = get_notification_queue()
-response_queue = get_response_queue()
-
-preset_id_map = aws.get_preset_map(transcoder, inverse=True)
-inverse_policy_map = get_inverse_policy_map()
-
 
 def lifecycle_continues():
     return not requested_to_quit
@@ -174,5 +162,17 @@ if __name__ == "__main__":
         logzero.loglevel(logging.DEBUG)
     else:
         logzero.loglevel(logging.INFO)
+
+    requested_to_quit = False
+
+    sqs = aws.get_sqs_resource()
+    transcoder = aws.get_transcoder_client()
+    s3 = aws.get_s3_resource()
+
+    notification_queue = get_notification_queue()
+    response_queue = get_response_queue()
+
+    preset_id_map = aws.get_preset_map(transcoder, inverse=True)
+    inverse_policy_map = get_inverse_policy_map()
 
     main()

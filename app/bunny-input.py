@@ -11,17 +11,6 @@ import settings
 import random
 import time
 
-requested_to_quit = False
-
-sqs = aws.get_sqs_resource()
-transcoder = aws.get_transcoder_client()
-s3 = aws.get_s3_resource()
-input_queue = get_input_queue()
-error_queue = get_error_queue()
-pipeline = get_pipeline()
-preset_id_map = aws.get_preset_map(transcoder)
-
-
 def lifecycle_continues():
     return not requested_to_quit
 
@@ -139,5 +128,15 @@ if __name__ == "__main__":
         logzero.loglevel(logging.DEBUG)
     else:
         logzero.loglevel(logging.INFO)
+
+    requested_to_quit = False
+
+    sqs = aws.get_sqs_resource()
+    transcoder = aws.get_transcoder_client()
+    s3 = aws.get_s3_resource()
+    input_queue = get_input_queue()
+    error_queue = get_error_queue()
+    pipeline = get_pipeline()
+    preset_id_map = aws.get_preset_map(transcoder)
 
     main()
