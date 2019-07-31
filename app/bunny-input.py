@@ -84,7 +84,7 @@ def process_message(message):
         metadataBody = '<JobInProgress><ElasticTranscoderJob>%s</ElasticTranscoderJob></JobInProgress>' % transcodeJob['Job']['Id']
         aws.put_s3_object(s3, settings.METADATA_BUCKET, metadataKey, metadataBody)
     else:
-        logging.info("Unknown message type received")
+        logger.info("Unknown message type received")
         return False, "Unknown message type"
 
 
@@ -94,7 +94,7 @@ def get_preset_id(policy_name):
     if policy_name in settings.TRANSCODE_MAPPINGS:
         preset_name = settings.TRANSCODE_MAPPINGS.get(policy_name)
     v = preset_id_map.get(preset_name)
-    logging.debug("get_preset_id (%s) = '%s'" % (policy_name, v))
+    logger.debug("get_preset_id (%s) = '%s'" % (policy_name, v))
     return v
 
 
