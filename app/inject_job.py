@@ -33,4 +33,4 @@ message = {
 sqs = boto3.resource('sqs', settings.REGION)
 queue = sqs.get_queue_by_name(QueueName=settings.INPUT_QUEUE)
 response = queue.send_message(MessageBody=json.dumps(message))
-print "Response status: %s" % (response['ResponseMetadata']['HTTPStatusCode'],)
+print("Response status: %s" % (response['ResponseMetadata']['HTTPStatusCode'],))

@@ -11,4 +11,6 @@ docker run \
         --env BUNNY_PIPELINE=bunny-pipeline  \
         --env BUNNY_OUTPUT_BUCKET=bunny-output  \
         --env BUNNY_JOB_DATA_BUCKET=bunny-job-data \
-        spacebunny
+        -d \
+        spacebunny \
+        python3 /opt/app/bunny-input.py
