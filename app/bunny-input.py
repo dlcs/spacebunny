@@ -10,7 +10,6 @@ import aws
 import settings
 import random
 import time
-from boto3.s3.key import Key
 
 requested_to_quit = False
 
