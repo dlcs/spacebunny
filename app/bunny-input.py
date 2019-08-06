@@ -39,12 +39,12 @@ def main():
                     try:
                         process_message(message)
                     except Exception as e:
-                        logger.error("Error processing message: " + str(e))
+                        logger.error(f"Error processing message: {e}")
                         aws.send_message(error_queue, message.body)
                     finally:
                         message.delete()
     except Exception as e:
-        logger.error("Error getting messages: " + str(e))
+        logger.error(f"Error getting messages: {e}")
         raise e
 
 
@@ -104,7 +104,9 @@ def transcode_video(job_id, dlcs_id, source, outputs):
         'dlcsId': str(dlcs_id),
         'startTime': str(int(round(time.time() * 1000)))
     }
-    return aws.create_job(transcoder, metadata, pipeline, source, outputs)
+    result = aws.create_job(transcoder, metadata, pipeline, source, outputs)
+    logger.debug(f"got result (type: {type(result)}): {result}")
+    return result
 
 
 def get_messages_from_queue():
