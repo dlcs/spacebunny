@@ -88,17 +88,20 @@ def get_preset_id(policy_name):
 
 def transcode_video(job_id, dlcs_id, source, outputs):
 
+    outputs_list = ()
+
     for output in outputs:
         # prepend a folder, output will be copied back to original Key if job succeeds
         output['Key'] = get_random_prefix() + output['Key']
         aws.delete_s3_object(s3, settings.OUTPUT_BUCKET, output['Key'])
+        outputs_list.append(output)
 
     metadata = {
         'jobId': str(job_id),
         'dlcsId': str(dlcs_id),
         'startTime': str(int(round(time.time() * 1000)))
     }
-    return aws.create_job(transcoder, metadata, pipeline, source, outputs)
+    return aws.create_job(transcoder, metadata, pipeline, source, outputs_list)
 
 
 def get_messages_from_queue():

@@ -8,7 +8,7 @@ from logzero import logger
 def create_job(transcoder, metadata, pipeline_id,  source, outputs):
     logger.debug("create_job()")
 
-    logger.debug("outputs: " + list(outputs))
+    logger.debug("outputs: " + str(outputs))
 
     result = transcoder.create_job(
         PipelineId=pipeline_id,
