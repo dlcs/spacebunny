@@ -88,7 +88,7 @@ def get_preset_id(policy_name):
 
 def transcode_video(job_id, dlcs_id, source, outputs):
 
-    outputs_list = ()
+    outputs_list = []
 
     for output in outputs:
         # prepend a folder, output will be copied back to original Key if job succeeds
