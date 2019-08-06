@@ -28,7 +28,9 @@ def create_job(transcoder, metadata, pipeline_id,  source, outputs):
     if result is not None:
         status_code = result['ResponseMetadata']['HTTPStatusCode']
         if 200 <= status_code < 300:
-            return result['Job']['Id']
+            jobId = result['Job']['Id']
+            logger.debug(f"transcode Job ID: {jobId}")
+            return jobId
     return None
 
 

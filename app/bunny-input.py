@@ -73,9 +73,13 @@ def process_message(message):
         # outputs = map(lambda o: {'Key': o.get('destination'),
         #                             'PresetId': get_preset_id(o.get('transcodePolicy'))}, formats)
         logger.debug("transcoding for jobId: %s" % (job_id,))
+
         transcodeJob = transcode_video(job_id, dlcs_id, source, outputs)
+        if transcodeJob is None:
+            raise Exception("transcode job creation failed")
+
         metadataKey = "%s/metadata" % (dlcs_id)
-        metadataBody = '<JobInProgress><ElasticTranscoderJob>%s</ElasticTranscoderJob></JobInProgress>' % transcodeJob['Job']['Id']
+        metadataBody = '<JobInProgress><ElasticTranscoderJob>%s</ElasticTranscoderJob></JobInProgress>' % transcodeJob
         aws.put_s3_object(s3, settings.METADATA_BUCKET, metadataKey, metadataBody)
     else:
         logger.info("Unknown message type received")
@@ -104,9 +108,7 @@ def transcode_video(job_id, dlcs_id, source, outputs):
         'dlcsId': str(dlcs_id),
         'startTime': str(int(round(time.time() * 1000)))
     }
-    result = aws.create_job(transcoder, metadata, pipeline, source, outputs)
-    logger.debug(f"got result (type: {type(result)}): {result}")
-    return result
+    return aws.create_job(transcoder, metadata, pipeline, source, outputs)
 
 
 def get_messages_from_queue():
