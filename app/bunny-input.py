@@ -64,8 +64,14 @@ def process_message(message):
         encoded_formats = params.get('formats')
         decoded_formats = base64.b64decode(encoded_formats)
         formats = json.loads(decoded_formats)
-        outputs = map(lambda o: {'Key': o.get('destination'),
-                                    'PresetId': get_preset_id(o.get('transcodePolicy'))}, formats)
+        outputs = []
+        for format in formats:
+            outputs.append({
+                'Key': format.get('destination'),
+                'PresetId': get_preset_id(format.get('transcodePolicy'))
+            })
+        # outputs = map(lambda o: {'Key': o.get('destination'),
+        #                             'PresetId': get_preset_id(o.get('transcodePolicy'))}, formats)
         logger.debug("transcoding for jobId: %s" % (job_id,))
         transcodeJob = transcode_video(job_id, dlcs_id, source, outputs)
         metadataKey = "%s/metadata" % (dlcs_id)
@@ -88,20 +94,17 @@ def get_preset_id(policy_name):
 
 def transcode_video(job_id, dlcs_id, source, outputs):
 
-    outputs_list = []
-
     for output in outputs:
         # prepend a folder, output will be copied back to original Key if job succeeds
         output['Key'] = get_random_prefix() + output['Key']
         aws.delete_s3_object(s3, settings.OUTPUT_BUCKET, output['Key'])
-        outputs_list.append(output)
 
     metadata = {
         'jobId': str(job_id),
         'dlcsId': str(dlcs_id),
         'startTime': str(int(round(time.time() * 1000)))
     }
-    return aws.create_job(transcoder, metadata, pipeline, source, outputs_list)
+    return aws.create_job(transcoder, metadata, pipeline, source, outputs)
 
 
 def get_messages_from_queue():

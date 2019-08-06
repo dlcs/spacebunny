@@ -1,5 +1,6 @@
 import boto3
 import botocore.exceptions
+import json
 
 import settings
 from logzero import logger
@@ -8,7 +9,7 @@ from logzero import logger
 def create_job(transcoder, metadata, pipeline_id,  source, outputs):
     logger.debug("create_job()")
 
-    logger.debug("outputs: " + str(outputs))
+    logger.debug("outputs: " + json.dumps(outputs))
 
     result = transcoder.create_job(
         PipelineId=pipeline_id,
