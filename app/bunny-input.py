@@ -38,13 +38,13 @@ def main():
                 if message is not None:
                     try:
                         process_message(message)
-                    except:
-                        logger.error("Error processing message")
+                    except Exception as e:
+                        logger.error("Error processing message: " + str(e))
                         aws.send_message(error_queue, message.body)
                     finally:
                         message.delete()
     except Exception as e:
-        logger.error("Error getting messages")
+        logger.error("Error getting messages: " + str(e))
         raise e
 
 
