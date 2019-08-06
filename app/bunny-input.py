@@ -98,7 +98,7 @@ def transcode_video(job_id, dlcs_id, source, outputs):
         'dlcsId': str(dlcs_id),
         'startTime': str(int(round(time.time() * 1000)))
     }
-    return aws.create_job(transcoder, metadata, pipeline, source, list(outputs))
+    return aws.create_job(transcoder, metadata, pipeline, source, outputs)
 
 
 def get_messages_from_queue():
