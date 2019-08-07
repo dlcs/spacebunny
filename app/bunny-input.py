@@ -6,6 +6,7 @@ from logzero import logger
 import os
 import signal
 import sys
+import traceback
 import aws
 import settings
 import random
@@ -38,7 +39,8 @@ def main():
                 if message is not None:
                     try:
                         process_message(message)
-                    except Exception as e:
+                    except Exception:
+                        e = traceback.format_exc()
                         logger.error(f"Error processing message: {e}")
                         aws.send_message(error_queue, message.body)
                     finally:

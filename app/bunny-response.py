@@ -44,6 +44,7 @@ def main():
                     except Exception:
                         e = traceback.format_exc()
                         logger.error(f"Error processing message: {e}")
+                        aws.send_message(error_queue, message.body)
                     finally:
                         message.delete()
     except Exception as e:
@@ -158,6 +159,10 @@ def get_response_queue():
     return aws.get_queue_by_name(sqs, settings.RESPONSE_QUEUE)
 
 
+def get_error_queue():
+    return aws.get_queue_by_name(sqs, settings.ERROR_QUEUE)
+
+
 if __name__ == "__main__":
 
     if settings.DEBUG:
@@ -173,6 +178,7 @@ if __name__ == "__main__":
 
     notification_queue = get_notification_queue()
     response_queue = get_response_queue()
+    error_queue = get_error_queue()
 
     preset_id_map = aws.get_preset_map(transcoder, inverse=True)
     inverse_policy_map = get_inverse_policy_map()
