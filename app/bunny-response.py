@@ -103,7 +103,7 @@ def process_message(message):
         }
         result_outputs.append(result_output)
 
-    outputs_string = base64.b64encode(json.dumps(result_outputs))
+    outputs_string = base64.b64encode(json.dumps(result_outputs).encode("utf-8"))
 
     if success_count > 0:
         if error_count > 0:
