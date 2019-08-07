@@ -40,12 +40,12 @@ def main():
                 if message is not None:
                     try:
                         process_message(message)
-                    except:
-                        logger.error("Error processing message")
+                    except Exception as e:
+                        logger.error(f"Error processing message: {e}")
                     finally:
                         message.delete()
     except Exception as e:
-        logger.error("Error getting messages")
+        logger.error(f"Error getting messages: {e}")
         raise e
 
 
