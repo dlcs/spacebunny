@@ -59,7 +59,7 @@ def process_message(message):
     et_job_id = data['jobId']
     job_id = data['userMetadata']['jobId']
     start_time = int(data['userMetadata']['startTime'])
-    dlcs_id = data['userMetadata']['dlcsId']
+    dlcs_id = base64.decode(data['userMetadata']['dlcsId'])
     source = data['input']['key']
 
     outputs = data['outputs']
