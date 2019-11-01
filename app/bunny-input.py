@@ -107,7 +107,7 @@ def transcode_video(job_id, dlcs_id, source, outputs):
 
     metadata = {
         'jobId': str(job_id),
-        'dlcsId': base64.encode(dlcs_id),
+        'dlcsId': base64.b64encode(dlcs_id),
         'startTime': str(int(round(time.time() * 1000)))
     }
     return aws.create_job(transcoder, metadata, pipeline, source, outputs)
